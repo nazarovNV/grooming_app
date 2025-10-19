@@ -1,0 +1,23 @@
+{% extends 'poker/base.html' %}
+
+{% block content %}
+<h2>Комнаты для голосования</h2>
+
+<form method="post" action="{% url 'create_room' %}">
+    {% csrf_token %}
+    <input type="text" name="room_name" placeholder="Название комнаты" required>
+    <button type="submit" class="btn">Создать комнату</button>
+</form>
+
+<hr>
+
+<h3>Существующие комнаты:</h3>
+{% for room in rooms %}
+    <div class="task">
+        <h4><a href="{% url 'room_detail' room.id %}">{{ room.name }}</a></h4>
+        <p>Создана: {{ room.created_at|date:"d.m.Y H:i" }}</p>
+    </div>
+{% empty %}
+    <p>Пока нет созданных комнат</p>
+{% endfor %}
+{% endblock %}

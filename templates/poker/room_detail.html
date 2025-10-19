@@ -1,0 +1,64 @@
+{% extends 'poker/base.html' %}
+
+{% block content %}
+<h2>{{ room.name }}</h2>
+<p>ID комнаты: {{ room.id }}</p>
+
+<h3>Добавить задачу</h3>
+<form method="post">
+    {% csrf_token %}
+    <input type="text" name="task_title" placeholder="Название задачи" required style="width: 300px; padding: 8px;">
+    <br><br>
+    <textarea name="task_description" placeholder="Описание задачи" style="width: 300px; height: 100px; padding: 8px;"></textarea>
+    <br><br>
+    <button type="submit" class="btn">Добавить задачу</button>
+</form>
+
+<hr>
+
+<h3>Задачи для оценки:</h3>
+{% for task in tasks %}
+    <div class="task">
+        <h4>{{ task.title }}</h4>
+        {% if task.description %}
+            <p>{{ task.description }}</p>
+        {% endif %}
+        
+        {% if task.final_score %}
+            <p><strong>Финальная оценка: {{ task.final_score }}</strong></p>
+        {% else %}
+            <div class="votes">
+                <form method="post" action="{% url 'vote' task.id %}" style="display: inline;">
+                    {% csrf_token %}
+                    <input type="text" name="voter_name" placeholder="Ваше имя" required>
+                    {% for value, label in task.FIBONACCI_CHOICES %}
+                        <button type="submit" name="score" value="{{ value }}" class="vote-btn">
+                            {{ label }}
+                        </button>
+                    {% endfor %}
+                </form>
+            </div>
+            
+            <div style="margin-top: 10px;">
+                <a href="{% url 'vote_results' task.id %}" class="btn">Результаты голосования</a>
+                
+                <form method="post" action="{% url 'complete_voting' task.id %}" style="display: inline;">
+                    {% csrf_token %}
+                    <select name="final_score" required>
+                        <option value="">Выберите финальную оценку</option>
+                        {% for value, label in task.FIBONACCI_CHOICES %}
+                            <option value="{{ value }}">{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                    <button type="submit" class="btn">Завершить голосование</button>
+                </form>
+            </div>
+        {% endif %}
+    </div>
+{% empty %}
+    <p>Пока нет задач для оценки</p>
+{% endfor %}
+
+<br>
+<a href="{% url 'room_list' %}" class="btn">← Назад к списку комнат</a>
+{% endblock %}

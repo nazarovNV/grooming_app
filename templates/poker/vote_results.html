@@ -1,0 +1,23 @@
+{% extends 'poker/base.html' %}
+
+{% block content %}
+<h2>Результаты голосования: {{ task.title }}</h2>
+
+<h3>Голоса:</h3>
+<ul>
+    {% for vote in votes %}
+        <li>{{ vote.voter_name }}: {{ vote.score }}</li>
+    {% empty %}
+        <li>Пока нет голосов</li>
+    {% endfor %}
+</ul>
+
+<h3>Статистика:</h3>
+<ul>
+    {% for score, count in vote_counts.items %}
+        <li>{{ score }}: {{ count }} голосов</li>
+    {% endfor %}
+</ul>
+
+<a href="{% url 'room_detail' task.room.id %}" class="btn">← Назад к комнате</a>
+{% endblock %}
