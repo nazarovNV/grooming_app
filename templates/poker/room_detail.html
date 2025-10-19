@@ -4,6 +4,16 @@
 <h2>{{ room.name }}</h2>
 <p>ID комнаты: {{ room.id }}</p>
 
+<!-- Форма для сохранения имени -->
+<h3>Ваше имя для голосования</h3>
+<form method="post">
+    {% csrf_token %}
+    <input type="text" name="voter_name" placeholder="Ваше имя" value="{{ voter_name }}" required style="width: 200px; padding: 8px;">
+    <button type="submit" name="save_name" class="btn">Сохранить имя</button>
+</form>
+
+<hr>
+
 <h3>Добавить задачу</h3>
 <form method="post">
     {% csrf_token %}
@@ -23,30 +33,39 @@
         {% if task.description %}
             <p>{{ task.description }}</p>
         {% endif %}
-        
+
         {% if task.final_score %}
             <p><strong>Финальная оценка: {{ task.final_score }}</strong></p>
         {% else %}
-            <div class="votes">
-                <form method="post" action="{% url 'vote' task.id %}" style="display: inline;">
-                    {% csrf_token %}
-                    <input type="text" name="voter_name" placeholder="Ваше имя" required>
-                    {% for value, label in task.FIBONACCI_CHOICES %}
-                        <button type="submit" name="score" value="{{ value }}" class="vote-btn">
-                            {{ label }}
-                        </button>
+            <!-- Форма для голосования -->
+            <form method="post" action="{% url 'vote' task.id %}" class="vote-form">
+                {% csrf_token %}
+                <input type="hidden" name="voter_name" value="{{ voter_name }}">
+
+                <div class="votes">
+                    {% for value, label in task.VOTE_CHOICES %}
+                        <label class="vote-option">
+                            <input type="radio" name="score" value="{{ value }}" required>
+                            <span class="vote-btn">{{ label }}</span>
+                        </label>
                     {% endfor %}
-                </form>
-            </div>
-            
+                </div>
+
+                {% if voter_name %}
+                    <button type="submit" class="btn" style="margin-top: 10px;">Голосовать</button>
+                {% else %}
+                    <p style="color: #e74c3c;">Сначала сохраните ваше имя выше</p>
+                {% endif %}
+            </form>
+
             <div style="margin-top: 10px;">
                 <a href="{% url 'vote_results' task.id %}" class="btn">Результаты голосования</a>
-                
-                <form method="post" action="{% url 'complete_voting' task.id %}" style="display: inline;">
+
+                <form method="post" action="{% url 'complete_voting' task.id %}" style="display: inline; margin-left: 10px;">
                     {% csrf_token %}
                     <select name="final_score" required>
                         <option value="">Выберите финальную оценку</option>
-                        {% for value, label in task.FIBONACCI_CHOICES %}
+                        {% for value, label in task.VOTE_CHOICES %}
                             <option value="{{ value }}">{{ label }}</option>
                         {% endfor %}
                     </select>

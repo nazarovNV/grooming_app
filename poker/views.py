@@ -12,20 +12,33 @@ def room_detail(request, room_id):
     room = get_object_or_404(Room, id=room_id)
     tasks = room.tasks.all()
 
+    # Получаем сохраненное имя из сессии
+    voter_name = request.session.get('voter_name', '')
+
     if request.method == 'POST':
-        task_title = request.POST.get('task_title')
-        task_description = request.POST.get('task_description')
-        if task_title:
-            Task.objects.create(
-                room=room,
-                title=task_title,
-                description=task_description
-            )
+        # Если это добавление задачи
+        if 'task_title' in request.POST:
+            task_title = request.POST.get('task_title')
+            task_description = request.POST.get('task_description')
+            if task_title:
+                Task.objects.create(
+                    room=room,
+                    title=task_title,
+                    description=task_description
+                )
+                return redirect('room_detail', room_id=room_id)
+
+        # Если это сохранение имени
+        elif 'save_name' in request.POST:
+            voter_name = request.POST.get('voter_name', '')
+            if voter_name:
+                request.session['voter_name'] = voter_name
             return redirect('room_detail', room_id=room_id)
 
     return render(request, 'poker/room_detail.html', {
         'room': room,
-        'tasks': tasks
+        'tasks': tasks,
+        'voter_name': voter_name
     })
 
 
@@ -37,6 +50,8 @@ def vote(request, task_id):
         score = request.POST.get('score')
 
         if voter_name and score:
+            # Сохраняем имя в сессии
+            request.session['voter_name'] = voter_name
             Vote.objects.update_or_create(
                 task=task,
                 voter_name=voter_name,

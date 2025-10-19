@@ -11,9 +11,34 @@
         .btn { background: #3498db; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; text-decoration: none; display: inline-block; }
         .btn:hover { background: #2980b9; }
         .task { border: 1px solid #ddd; padding: 15px; margin: 10px 0; border-radius: 4px; }
-        .votes { display: flex; gap: 10px; margin: 10px 0; }
-        .vote-btn { padding: 10px; border: 1px solid #3498db; background: white; cursor: pointer; border-radius: 4px; }
-        .vote-btn:hover { background: #3498db; color: white; }
+        .votes { display: flex; flex-wrap: wrap; gap: 10px; margin: 10px 0; }
+        .vote-option { display: inline-block; }
+        .vote-option input[type="radio"] { display: none; }
+        .vote-btn {
+            padding: 10px 15px;
+            border: 2px solid #3498db;
+            background: white;
+            cursor: pointer;
+            border-radius: 4px;
+            display: inline-block;
+            text-align: center;
+            min-width: 50px;
+        }
+        .vote-option input[type="radio"]:checked + .vote-btn {
+            background: #3498db;
+            color: white;
+        }
+        .vote-btn:hover {
+            background: #3498db;
+            color: white;
+        }
+        .vote-form { margin: 15px 0; }
+        input[type="text"], textarea, select {
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
     </style>
 </head>
 <body>
